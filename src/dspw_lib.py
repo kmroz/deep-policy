@@ -13,14 +13,45 @@ class Node(str):
     Syntactic candy for a Node. It's really just a string.
     '''
 
+class NodeContainer(object):
+    def __init__(self):
+        self.available_nodes = []         # Available Nodes
+        self.nodes = []                   # Nodes added
 
-class Role(object):
+    def add_node(self, node):
+        '''
+        Add a Node to this Cluster. Checks the list of available nodes.
+        '''
+        if node in self.available_nodes:
+            self.nodes.append(node)
+            self.nodes.sort()
+            self.available_nodes.remove(node)
+        else:
+            # We are trying to add a Node that is not listed as available. Let the caller
+            # handle the exception.
+            raise ValueError("{} is not an available node in this cluster.")
+
+    def remove_node(self, node):
+        '''
+        Remove a Node from the cluster, and reposition it in the available list.
+        TODO: When removing a Node, will need to remove it from any Roles as well.
+              This can be added to a Role specific remove_node()
+        '''
+        if node in self.nodes:
+            self.nodes.remove(node)
+            self.available_nodes.append(node)
+            self.available_nodes.sort()
+        else:
+            # Attempt to remove a Node from the cluster that was not added.
+            raise ValueError("{} has not been added to this cluster.")
+
+
+class Role(NodeContainer):
     '''
     Roles contain a number of Nodes.
     '''
     def __init__(self):
-        self.available_nodes = []  # Available Nodes to add to this Role.
-        self.nodes = []            # Nodes which have been added to the Role.
+        super(Role, self).__init__()
 
 
 class AdminRole(Role): pass
@@ -54,7 +85,7 @@ role_map = { "role-admin"       : AdminRole,
 }
 
 
-class Cluster(object):
+class Cluster(NodeContainer):
     '''
     A Cluster contains a number of usable Nodes as well as a number of Roles.
     '''
@@ -62,9 +93,8 @@ class Cluster(object):
     def __init__(self, proposal_dir="/srv/pillar/ceph/proposals/"):
         self.proposal_dir = proposal_dir  # Proposal directory containing SLS and YAML files
         self.cluster_sls_dir = proposal_dir + "/cluster-ceph/cluster/"
-        self.available_nodes = []         # Available Nodes to add to the Cluster
-        self.nodes = []                   # Nodes added to the Cluster
         self.roles = []                   # Potential Roles in the Cluster
+        super(Cluster, self).__init__()
 
     def discover_nodes(self):
         '''
@@ -82,32 +112,6 @@ class Cluster(object):
 
         # For ease of viewing, let's sort the list alphabetically
         self.available_nodes.sort()
-
-    def add_node(self, Node):
-        '''
-        Add a Node to this Cluster. Checks the list of available nodes.
-        '''
-        if Node in self.available_nodes:
-            self.nodes.append(Node)
-            self.nodes.sort()
-            self.available_nodes.remove(Node)
-        else:
-            # We are trying to add a Node that is not listed as available. Let the caller
-            # handle the exception.
-            raise ValueError("{} is not an available node in this cluster.")
-
-    def remove_node(self, Node):
-        '''
-        Remove a Node from the cluster, and reposition it in the available list.
-        TODO: When removing a Node, will need to remove it from any Roles as well.
-        '''
-        if Node in self.nodes:
-            self.nodes.remove(Node)
-            self.available_nodes.append(Node)
-            self.available_nodes.sort()
-        else:
-            # Attempt to remove a Node from the cluster that was not added.
-            raise ValueError("{} has not been added to this cluster.")
 
     def discover_roles(self):
         '''
