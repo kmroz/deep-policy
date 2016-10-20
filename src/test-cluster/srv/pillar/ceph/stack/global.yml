@@ -1,0 +1,3 @@
+# /srv/pillar/ceph/stack/global.yml
+# Overwrites configuration in /srv/pillar/ceph/stack/default/global.yml
+time_server: ca.pool.ntp.org

@@ -1,0 +1,10 @@
+mon_host:
+- 10.0.0.6
+- 10.0.0.239
+- 10.0.0.119
+- 10.0.0.84
+mon_initial_members:
+- salttest-2
+- salttest-3
+- salttest-4
+- salttest-1

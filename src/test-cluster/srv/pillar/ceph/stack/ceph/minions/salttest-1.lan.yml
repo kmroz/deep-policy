@@ -1,0 +1,2 @@
+# /srv/pillar/ceph/stack/ceph/minions/salttest-1.lan.yml
+# Overwrites configuration in /srv/pillar/ceph/stack/default/ceph/minions/salttest-1.lan.yml

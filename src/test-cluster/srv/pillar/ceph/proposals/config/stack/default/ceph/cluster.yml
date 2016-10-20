@@ -1,0 +1,13 @@
+admin_method: default
+cluster_network: 10.0.0.0/24
+configuration_method: default
+fsid: bbe659e1-e5cc-3dcc-8e29-10098f25f9c7
+mds_method: default
+mon_method: default
+osd_method: default
+package_method: default
+pool_method: default
+public_network: 10.0.0.0/24
+repo_method: default
+rgw_method: default
+update_method: default
