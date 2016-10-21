@@ -18,6 +18,24 @@ class NodeContainer(object):
         self.available_nodes = []         # Available Nodes
         self.nodes = []                   # Nodes added
 
+    def discover_nodes(self, path, extension):
+        '''
+        Discover list of available Nodes that can be added to this Container.
+        Each Node is represented by an SLS file in a particular directory.
+        '''
+        cluster_sls_files = glob.glob(path + "*." + extension)
+
+        # Wipe self.available_nodes first.
+        self.available_nodes = []
+
+        for f in cluster_sls_files:
+            # From something like "/srv/pillar/ceph/proposals/cluster-ceph/cluster/node-1.foo.bar.sls"
+            # we extract "node-1.foo.bar" and create our Node
+            self.available_nodes.append(Node(f.split('/')[-1].split("." + extension)[0]))
+
+        # For ease of viewing, let's sort the list alphabetically
+        self.available_nodes.sort()
+
     def add_node(self, node):
         '''
         Add a Node to this Cluster. Checks the list of available nodes.
@@ -52,6 +70,9 @@ class Role(NodeContainer):
     '''
     def __init__(self):
         super(Role, self).__init__()
+        self.discover_nodes()
+
+    def discover_nodes(self): pass
 
 
 class AdminRole(Role): pass
@@ -97,21 +118,7 @@ class Cluster(NodeContainer):
         super(Cluster, self).__init__()
 
     def discover_nodes(self):
-        '''
-        Discover list of available Nodes that can be added to this Cluster.
-        '''
-        cluster_sls_files = glob.glob(self.cluster_sls_dir + "*.sls")
-
-        # Wipe self.available_nodes first.
-        self.available_nodes = []
-
-        for f in cluster_sls_files:
-            # From something like "/srv/pillar/ceph/proposals/cluster-ceph/cluster/node-1.foo.bar.sls"
-            # we extract "node-1.foo.bar" and create our Node
-            self.available_nodes.append(Node(f.split('/')[-1].split('.sls')[0]))
-
-        # For ease of viewing, let's sort the list alphabetically
-        self.available_nodes.sort()
+        super(Cluster, self).discover_nodes(self.cluster_sls_dir, "sls")
 
     def discover_roles(self):
         '''
