@@ -68,11 +68,13 @@ class Role(NodeContainer):
     '''
     Roles contain a number of Nodes.
     '''
-    def __init__(self):
+    def __init__(self, role_dir):
         super(Role, self).__init__()
+	self.role_dir = role_dir
         self.discover_nodes()
 
-    def discover_nodes(self): pass
+    def discover_nodes(self):
+	super(Role, self).discover_nodes(self.role_dir + "/cluster", "sls")
 
 
 class AdminRole(Role): pass
@@ -124,21 +126,19 @@ class Cluster(NodeContainer):
         '''
         Discover available Roles that can be added to this Cluster.
         '''
-        cluster_role_dirs = glob.glob(self.proposal_dir + "role-*")
-        cluster_role_names = []
+	cluster_roles = {}
 
-        for d in cluster_role_dirs:
+	for d in glob.glob(self.proposal_dir + "/role-*"):
             # Populate self.roles with appropriate Role objects based on name.
-            cluster_role_names.append(d.split('/')[-1].split('.sls')[0])
+	    cluster_roles[d.split('/')[-1].split('.sls')[0]] = d
 
-        cluster_role_names.sort()
         # Wipe self.roles first.
         self.roles = []
 
-        for r in cluster_role_names:
+	for r,d in cluster_roles.items():
             # Instantiate our list of Roles based on Role names found in the Cluster.
             try:
-                self.roles.append(role_map[r]())
+		self.roles.append(role_map[r](d))
             except KeyError:
                 print "Role {} is not supported by this script. " \
                     "To use {} in the cluster, add it manually to your policy.cfg".format(r, r)
