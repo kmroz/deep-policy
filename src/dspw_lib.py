@@ -23,7 +23,7 @@ class NodeContainer(object):
         Discover list of available Nodes that can be added to this Container.
         Each Node is represented by an SLS file in a particular directory.
         '''
-        cluster_sls_files = glob.glob(path + "*." + extension)
+	cluster_sls_files = glob.glob(path + "/*." + extension)
 
         # Wipe self.available_nodes first.
         self.available_nodes = []
@@ -113,9 +113,9 @@ class Cluster(NodeContainer):
     A Cluster contains a number of usable Nodes as well as a number of Roles.
     '''
 
-    def __init__(self, proposal_dir="/srv/pillar/ceph/proposals/"):
+    def __init__(self, proposal_dir="/srv/pillar/ceph/proposals"):
         self.proposal_dir = proposal_dir  # Proposal directory containing SLS and YAML files
-        self.cluster_sls_dir = proposal_dir + "/cluster-ceph/cluster/"
+	self.cluster_sls_dir = proposal_dir + "/cluster-ceph/cluster"
         self.roles = []                   # Potential Roles in the Cluster
         super(Cluster, self).__init__()
 
