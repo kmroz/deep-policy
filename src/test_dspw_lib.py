@@ -10,7 +10,7 @@ import sys
 import glob
 import dspw_lib as dspwl
 
-test_cluster_proposal_path="./test-cluster/srv/pillar/ceph/proposals/"
+test_cluster_proposal_path="./test-cluster/srv/pillar/ceph/proposals"
 
 def test_node_creation():
     '''
@@ -26,7 +26,7 @@ def test_available_node_discovery():
     signify a Node.
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
-    cluster_sls_files = glob.glob(c.cluster_sls_dir + "*.sls")
+    cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
     c.discover_nodes()
 
     assert len(c.available_nodes) == len(cluster_sls_files)
@@ -36,7 +36,7 @@ def test_discovered_node_names():
     A Node name should match the SLS filename depicting that Node.
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
-    cluster_sls_files = glob.glob(c.cluster_sls_dir + "*.sls")
+    cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
     c.discover_nodes()
 
     # Needs to be sorted, as our Cluster:discover_nodes() provides a sorted Node list.
@@ -49,7 +49,7 @@ def test_add_node():
     Test addition of Node to the cluster.
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
-    cluster_sls_files = glob.glob(c.cluster_sls_dir + "*.sls")
+    cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
     c.discover_nodes()
 
     n = c.available_nodes[0]
@@ -66,7 +66,7 @@ def test_add_unavailable_node():
     Test error handling when adding a Node that is not available to the cluster.
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
-    cluster_sls_files = glob.glob(c.cluster_sls_dir + "*.sls")
+    cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
     c.discover_nodes()
 
     try:
@@ -81,7 +81,7 @@ def test_remove_node():
     Test Node removal.
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
-    cluster_sls_files = glob.glob(c.cluster_sls_dir + "*.sls")
+    cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
     c.discover_nodes()
 
     n = c.available_nodes[0]
@@ -99,7 +99,7 @@ def test_remove_unavailable_node():
     Test error handling of invalid Node removal.
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
-    cluster_sls_files = glob.glob(c.cluster_sls_dir + "*.sls")
+    cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
     c.discover_nodes()
 
     n = c.available_nodes[0]
@@ -119,7 +119,7 @@ def test_available_role_discovery():
     signifies a Role.
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
-    cluster_role_dirs = glob.glob(c.proposal_dir + "role-*")
+    cluster_role_dirs = glob.glob(c.proposal_dir + "/role-*")
 
     c.discover_roles()
 
