@@ -97,11 +97,28 @@ class MasterRole(Role): pass
 class MDSRole(Role): pass
 class MDSClientRole(Role): pass
 class MDSNFSRole(Role): pass
-class MonRole(Role): pass
 class RGWRole(Role): pass
 class RGWClientRole(Role): pass
 class RGWNFSRole(Role): pass
 class StorageRole(Role): pass # TODO: Will be empty. Storage Nodes will need to link to hw profile dir.
+
+
+class MonRole(Role):
+    '''
+    A Role, but special in that it also contains yml files deeper in it's directory structure.
+    '''
+    def __init__(self, role_dir):
+        super(MonRole, self).__init__(role_dir)
+        self.yml_dir = self.role_dir + "/stack/default/ceph/minions/"  # TODO: ceph is constant?
+
+    def discover_nodes(self, cluster_nodes):
+        '''
+        When doing Node discovery, only discover those nodes that have corresponding yml files.
+        '''
+        super(MonRole, self).discover_nodes(cluster_nodes)
+        # Remove any Nodes that don't have a matching yaml file?
+        self.available_nodes = [n for n in self.available_nodes if glob.glob(self.yml_dir + "/" + n + ".yml")]
+        self.nodes = [n for n in self.nodes if glob.glob(self.yml_dir + "/" + n + ".yml")]
 
 
 # A mapping of Role names to actual Classes. Used during Role discovery to instantiate
