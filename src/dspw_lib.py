@@ -67,12 +67,21 @@ class Role(NodeContainer):
     Roles contain a number of Nodes.
     '''
     def __init__(self, role_dir):
+	'''
+	A Role is initialized with empty node lists. When a Node is added to a Cluster,
+	the Cluster is responsible for invoking Node discovery on it's Roles.
+	'''
         super(Role, self).__init__()
 	self.role_dir = role_dir
-        self.discover_nodes()
 
-    def discover_nodes(self):
+    def discover_nodes(self, cluster_nodes):
+	'''
+	For a Role, only discover Nodes which are already added to the Cluster.
+	'''
+	# First, obtain all the Nodes possible for this Role.
 	super(Role, self).discover_nodes(self.role_dir + "/cluster", "sls")
+	# Strip away Nodes that are not in cluster_nodes.
+	self.available_nodes = [n for n in self.available_nodes if n in cluster_nodes]
 
 
 class AdminRole(Role): pass
@@ -115,14 +124,36 @@ class Cluster(NodeContainer):
         self.proposal_dir = proposal_dir  # Proposal directory containing SLS and YAML files
 	self.cluster_sls_dir = proposal_dir + "/cluster-ceph/cluster"
         self.roles = []                   # Potential Roles in the Cluster
-        super(Cluster, self).__init__()
+	super(Cluster, self).__init__()   # Will initialize node lists
+	self.discover_nodes()
+	self.discover_roles()
 
     def discover_nodes(self):
         super(Cluster, self).discover_nodes(self.cluster_sls_dir, "sls")
 
+    def add_node(self, node):
+	'''
+	Part of adding a Node to the Cluster involves adding it to the list of available Nodes
+	for a Role. Thus, on each Node addition to the cluster, rediscover Roles.
+	'''
+	super(Cluster, self).add_node(node)
+	for r in self.roles:
+	    r.discover_nodes(self.nodes)
+
+    def remove_node(self, node):
+	'''
+	Part of removing a Node from the Cluster involves removing it from the list of available Nodes
+	for a Role. Thus, on each Node removal from the cluster, rediscover Roles.
+	'''
+	super(Cluster, self).remove_node(node)
+	for r in self.roles:
+	    r.discover_nodes(self.nodes)
+
     def discover_roles(self):
         '''
-        Discover available Roles that can be added to this Cluster.
+	Discover available Roles that can be added to this Cluster. Roles start out pretty barren
+	with empty node lists on discovery. When a Node is added to the Cluster, Node discovery for
+	available Roles will be run to populate the Roles available Node list.
         '''
 	cluster_roles = {}
 
