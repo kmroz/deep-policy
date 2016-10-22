@@ -47,13 +47,11 @@ class NodeContainer(object):
         else:
             # We are trying to add a Node that is not listed as available. Let the caller
             # handle the exception.
-            raise ValueError("{} is not an available node in this cluster.")
+	    raise ValueError("{} is not an available node in this cluster.".format(node))
 
     def remove_node(self, node):
         '''
         Remove a Node from the cluster, and reposition it in the available list.
-        TODO: When removing a Node, will need to remove it from any Roles as well.
-              This can be added to a Role specific remove_node()
         '''
         if node in self.nodes:
             self.nodes.remove(node)
@@ -61,7 +59,7 @@ class NodeContainer(object):
             self.available_nodes.sort()
         else:
             # Attempt to remove a Node from the cluster that was not added.
-            raise ValueError("{} has not been added to this cluster.")
+	    raise ValueError("{} has not been added to this cluster.".format(node))
 
 
 class Role(NodeContainer):
