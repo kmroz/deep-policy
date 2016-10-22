@@ -23,12 +23,12 @@ class NodeContainer(object):
         Discover list of available Nodes that can be added to this Container.
         Each Node is represented by an SLS file in a particular directory.
         '''
-	cluster_sls_files = glob.glob(path + "/*." + extension)
+	node_sls_files = glob.glob(path + "/*." + extension)
 
-        # Wipe self.available_nodes first.
+	# Wipe available node list as we are discovering.
         self.available_nodes = []
 
-        for f in cluster_sls_files:
+	for f in node_sls_files:
             # From something like "/srv/pillar/ceph/proposals/cluster-ceph/cluster/node-1.foo.bar.sls"
             # we extract "node-1.foo.bar" and create our Node
             self.available_nodes.append(Node(f.split('/')[-1].split("." + extension)[0]))
