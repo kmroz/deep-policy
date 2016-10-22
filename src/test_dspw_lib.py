@@ -27,7 +27,6 @@ def test_available_node_discovery():
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
     cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
-    c.discover_nodes()
 
     assert len(c.available_nodes) == len(cluster_sls_files)
 
@@ -37,7 +36,6 @@ def test_discovered_node_names():
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
     cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
-    c.discover_nodes()
 
     # Needs to be sorted, as our Cluster:discover_nodes() provides a sorted Node list.
     cluster_sls_files.sort()
@@ -50,7 +48,6 @@ def test_add_node():
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
     cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
-    c.discover_nodes()
 
     n = c.available_nodes[0]
 
@@ -67,7 +64,6 @@ def test_add_unavailable_node():
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
     cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
-    c.discover_nodes()
 
     try:
         c.add_node("NonExistentNode")
@@ -82,7 +78,6 @@ def test_remove_node():
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
     cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
-    c.discover_nodes()
 
     n = c.available_nodes[0]
     c.add_node(n)
@@ -100,7 +95,6 @@ def test_remove_unavailable_node():
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
     cluster_sls_files = glob.glob(c.cluster_sls_dir + "/*.sls")
-    c.discover_nodes()
 
     n = c.available_nodes[0]
     c.add_node(n)
@@ -120,7 +114,5 @@ def test_available_role_discovery():
     '''
     c = dspwl.Cluster(test_cluster_proposal_path)
     cluster_role_dirs = glob.glob(c.proposal_dir + "/role-*")
-
-    c.discover_roles()
 
     assert len(c.roles) == len(cluster_role_dirs)
