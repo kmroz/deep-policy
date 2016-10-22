@@ -36,6 +36,11 @@ class NodeContainer(object):
         # For ease of viewing, let's sort the list alphabetically
         self.available_nodes.sort()
 
+	# Now on rediscovery, it's possible that self.nodes is not empty. This puts
+	# us in an awkward state where a given Node may be in both lists. Remove any
+	# nodes already added to self.nodes from self.available_nodes.
+	self.available_nodes = [n for n in self.available_nodes if n not in self.nodes]
+
     def add_node(self, node):
         '''
         Add a Node to this Cluster. Checks the list of available nodes.
@@ -82,6 +87,7 @@ class Role(NodeContainer):
 	super(Role, self).discover_nodes(self.role_dir + "/cluster", "sls")
 	# Strip away Nodes that are not in cluster_nodes.
 	self.available_nodes = [n for n in self.available_nodes if n in cluster_nodes]
+	self.nodes = [n for n in self.nodes if n in cluster_nodes]
 
 
 class AdminRole(Role): pass
@@ -154,6 +160,7 @@ class Cluster(NodeContainer):
 	Discover available Roles that can be added to this Cluster. Roles start out pretty barren
 	with empty node lists on discovery. When a Node is added to the Cluster, Node discovery for
 	available Roles will be run to populate the Roles available Node list.
+	TODO: should only be done once - exception if self.roles populated?
         '''
 	cluster_roles = {}
 
