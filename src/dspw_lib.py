@@ -155,14 +155,11 @@ class Cluster(NodeContainer):
 	for r in self.roles:
 	    r.discover_nodes(self.nodes)
 
-    def discover_roles(self):
+    def _init_roles(self):
         '''
-	Discover available Roles that can be added to this Cluster. Roles start out pretty barren
-	with empty node lists on discovery. When a Node is added to the Cluster, Node discovery for
-	available Roles will be run to populate the Roles available Node list.
-	TODO: should only be done once - exception if self.roles populated?
+        Initialize our Roles list.
         '''
-	cluster_roles = {}
+        cluster_roles = {}
 
 	for d in glob.glob(self.proposal_dir + "/role-*"):
             # Populate self.roles with appropriate Role objects based on name.
@@ -174,9 +171,21 @@ class Cluster(NodeContainer):
 	for r,d in cluster_roles.items():
             # Instantiate our list of Roles based on Role names found in the Cluster.
             try:
-		role = role_map[r](d)
-		role.discover_nodes(self.nodes)
-		self.roles.append(role)
+		self.roles.append(role_map[r](d))
             except KeyError:
                 print "Role {} is not supported by this script. " \
                     "To use {} in the cluster, add it manually to your policy.cfg".format(r, r)
+
+    def discover_roles(self):
+        '''
+	Discover available Roles that can be added to this Cluster. Roles start out pretty barren
+	with empty node lists on discovery. When a Node is added to the Cluster, Node discovery for
+	available Roles will be run to populate the Roles available Node list.
+        '''
+        # Check if we have initialized our Roles list.
+        if len(self.roles) == 0:
+            self._init_roles()
+
+        # Run Node discovery on each Role.
+        for role in self.roles:
+            role.discover_nodes(self.nodes)
