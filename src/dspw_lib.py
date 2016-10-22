@@ -167,7 +167,9 @@ class Cluster(NodeContainer):
 	for r,d in cluster_roles.items():
             # Instantiate our list of Roles based on Role names found in the Cluster.
             try:
-		self.roles.append(role_map[r](d))
+		role = role_map[r](d)
+		role.discover_nodes(self.nodes)
+		self.roles.append(role)
             except KeyError:
                 print "Role {} is not supported by this script. " \
                     "To use {} in the cluster, add it manually to your policy.cfg".format(r, r)
